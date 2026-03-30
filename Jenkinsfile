@@ -14,7 +14,7 @@ pipeline {
 
         stage("Checkout from SCM"){
                 steps {
-                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/Ashfaque-9x/register-app'
+                    git branch: 'main', credentialsId: 'github-TOKEN', url: 'https://github.com/JadJml/join-app.git'
                 }
         }
 
@@ -22,14 +22,11 @@ pipeline {
             steps {
                 sh "mvn clean package"
             }
-
        }
-
        stage("Test Application"){
            steps {
                  sh "mvn test"
            }
        }
-
     }
 }
