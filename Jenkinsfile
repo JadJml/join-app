@@ -10,7 +10,7 @@ pipeline {
         APP_NAME = "join-app"
         RELEASE = "0.0.1"
         DOCKER_USER = "jadweb"
-        DOCKER_PASS = 'token-dockerhub'   // ID des credentials Docker dans Jenkins
+        DOCKER_PASS = credentials("token-dockerhub")  // ID des credentials Docker dans Jenkins
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -46,11 +46,11 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
+                    docker.withRegistry('',"token-dockerhub") {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
 
-                    docker.withRegistry('',DOCKER_PASS) {
+                    docker.withRegistry('',"token-dockerhub") {
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
                     }
@@ -58,6 +58,8 @@ pipeline {
             }
 
        }
+
+
 
 
 
