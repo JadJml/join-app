@@ -35,11 +35,14 @@ pipeline {
            }
        }
   
-        stage("Build Docker Image"){
-             steps {
-                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-             }
-         }
+      stage ("build Docker Image")
+          {
+            steps {
+                script {
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+       }
 
     }
 }
