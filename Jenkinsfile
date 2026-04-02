@@ -10,7 +10,7 @@ pipeline {
         APP_NAME = "join-app"
         RELEASE = "0.0.1"
         DOCKER_USER = "jadweb"
-        DOCKER_PASS = 'token-dockerhub'  // ID des credentials Docker dans Jenkins
+        DOCKER_PASS = 'token-dockerhub'   // ID credentials Jenkins
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -31,41 +31,48 @@ pipeline {
             }
         }
 
-        stage("Build Applications") {
+        stage("Build Application") {
             steps {
-                sh "mvn clean package"
+                sh "mvn clean package -DskipTests"
             }
         }
 
-        stage("Test Application") {
+        stage("Run Tests") {
             steps {
                 sh "mvn test"
             }
         }
 
-        stage("Build & Push Docker Image") {
+        stage("Build Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
+                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage("Push Docker Image") {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_PASS) {
+                        dockerImage.push()
+                        dockerImage.push("${RELEASE}-latest")
                     }
                 }
             }
-             
-             docker.withRegistry('',DOCKER_PASS) {
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('${RELEASE}-latest')
-                    }
+        }
 
+    }
 
-       }
-
-
-
-
-
-
-
-
+    post {
+        success {
+            echo "✅ Build terminé avec succès : ${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "❌ Échec du pipeline"
+        }
+        always {
+            cleanWs()
+        }
     }
 }
