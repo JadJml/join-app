@@ -39,7 +39,7 @@ pipeline {
           {
             steps {
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
+                    docker.withRegistry('',"token-msr") {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
                       }
