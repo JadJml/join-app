@@ -10,7 +10,7 @@ pipeline {
         APP_NAME = "join-app"
         RELEASE = "0.0.1"
         DOCKER_USER = "jadweb"
-        DOCKER_PASS = 'token-msr' // credentials ID
+        DOCKER_PASS = 'token-dockerhub' // credentials ID
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
