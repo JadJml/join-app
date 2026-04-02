@@ -3,13 +3,13 @@ pipeline {
     tools {
         jdk 'Java17'
         maven 'Maven3'
-        
+
     }
        environment {
 	    APP_NAME = "join-app"
             RELEASE = "0.0.1"
             DOCKER_USER = "jadweb"
-            DOCKER_PASS = 'token-msr'
+            DOCKER_PASS = credentials("token-msr")   // ID des credentials Docker dans Jenkins
             IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
             IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -34,5 +34,12 @@ pipeline {
                  sh "mvn test"
            }
        }
+  
+        stage("Build Docker Image"){
+             steps {
+                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+             }
+         }
+
     }
 }
