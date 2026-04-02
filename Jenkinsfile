@@ -46,13 +46,8 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('',"token-dockerhub") {
+                    docker.withRegistry('','token-dockerhub') {
                         docker_image = docker.build "${IMAGE_NAME}"
-                    }
-
-                    docker.withRegistry('',"token-dockerhub") {
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
                     }
                 }
             }
