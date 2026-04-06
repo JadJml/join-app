@@ -25,7 +25,7 @@ pipeline {
             }
         }
 
-        stage("Checkout a from  SCM") {
+        stage("Checkout from SCM") {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-TOKEN',
