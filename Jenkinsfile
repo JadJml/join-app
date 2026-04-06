@@ -6,8 +6,6 @@ pipeline {
         jdk 'Java17'
         maven 'Maven3'
     }
-    
-
     environment {
         APP_NAME = "join-app"
         RELEASE = "0.0.1"
@@ -63,6 +61,15 @@ pipeline {
                 }
             }
         }
+
+               stage ('Cleanup Artifacts') {
+           steps {
+               script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker rmi ${IMAGE_NAME}:latest"
+               }
+          }
+       }
 
     }
 
