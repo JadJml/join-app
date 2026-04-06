@@ -1,10 +1,12 @@
 pipeline {
+
     agent { label 'Jenkisn-Agent' }
 
     tools {
         jdk 'Java17'
         maven 'Maven3'
     }
+    
 
     environment {
         APP_NAME = "join-app"
