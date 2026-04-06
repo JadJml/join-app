@@ -39,7 +39,7 @@ pipeline {
             }
         }
 
-        stage("Run Tests") {
+        stage("Run Test") {
             steps {
                 sh "mvn test"
             }
