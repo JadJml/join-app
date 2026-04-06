@@ -6,13 +6,14 @@ pipeline {
         jdk 'Java17'
         maven 'Maven3'
     }
+
     environment {
         APP_NAME = "join-app"
         RELEASE = "0.0.1"
         DOCKER_USER = "jadweb"
-        DOCKER_PASS = 'token-dockerhub'   // ID credentials Jenkins
-        IMAGE_NAME = "${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}"
+        DOCKER_PASS = 'token-dockerhub'   // Jenkins credentials ID
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
 
     stages {
@@ -37,7 +38,7 @@ pipeline {
             }
         }
 
-        stage("Run Test") {
+        stage("Run Tests") {
             steps {
                 sh "mvn test"
             }
@@ -55,44 +56,40 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
-                        dockerImage.push("${IMAGE_TAG}")
+                        dockerImage.push()
+                        dockerImage.push("latest")
                     }
                 }
             }
         }
 
-               stage ('Cleanup Artifacts ') {
-           steps {
-               script {
-                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
-               }
-          }
-       }
+        stage("Run Container") {
+            steps {
+                script {
+                    sh """
+                    docker stop ${APP_NAME} || true
+                    docker rm ${APP_NAME} || true
 
-stage("Run Container") {
-    steps {
-        script {
-            sh """
-            # Stop ancien container s'il existe
-            docker stop ${APP_NAME} || true
-            docker rm ${APP_NAME} || true
-
-            # Run nouveau container
-            docker run -d \
-              --name ${APP_NAME} \
-              -p 9095:8080 \
-              ${IMAGE_NAME}:${IMAGE_TAG}
-            """
+                    docker run -d \
+                      --name ${APP_NAME} \
+                      -p 9095:8080 \
+                      ${IMAGE_NAME}:${IMAGE_TAG}
+                    """
+                }
+            }
         }
-    }
-}
 
-
+        stage("Cleanup Docker Images") {
+            steps {
+                sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
+            }
+        }
     }
 
     post {
         success {
-            echo "✅ Build terminé avec succès : ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Build terminé : ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Application : http://localhost:9095"
         }
         failure {
             echo "❌ Échec du pipeline"
