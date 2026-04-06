@@ -71,6 +71,25 @@ pipeline {
           }
        }
 
+stage("Run Container") {
+    steps {
+        script {
+            sh """
+            # Stop ancien container s'il existe
+            docker stop ${APP_NAME} || true
+            docker rm ${APP_NAME} || true
+
+            # Run nouveau container
+            docker run -d \
+              --name ${APP_NAME} \
+              -p 9095:8080 \
+              ${IMAGE_NAME}:${IMAGE_TAG}
+            """
+        }
+    }
+}
+
+
     }
 
     post {
