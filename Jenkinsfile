@@ -11,8 +11,8 @@ pipeline {
         RELEASE = "0.0.1"
         DOCKER_USER = "jadweb"
         DOCKER_PASS = 'token-dockerhub'   // ID credentials Jenkins
-        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        IMAGE_NAME = "${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}"
     }
 
     stages {
@@ -55,8 +55,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
-                        dockerImage.push()
-                        dockerImage.push("${RELEASE}-latest")
+                        dockerImage.push("${IMAGE_TAG}")
                     }
                 }
             }
